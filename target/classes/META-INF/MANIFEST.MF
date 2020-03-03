@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: rogarofalo
+Class-Path: lib/jsch-0.1.55.jar lib/log4j-core-2.10.0.jar lib/log4j-ap
+ i-2.10.0.jar lib/log4j-slf4j-impl-2.10.0.jar lib/slf4j-api-1.8.0-alph
+ a2.jar lib/log4j-1.2.17.jar lib/arsys-api-8.0.jar lib/mysql-connector
+ -java-8.0.17.jar lib/protobuf-java-3.6.1.jar
+Build-Jdk: 1.8.0_191
+Created-By: Maven Integration for Eclipse
+Main-Class: it.fastweb.editTT.EditSPpplication
+
