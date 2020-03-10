@@ -1,35 +1,49 @@
 package it.fastweb.editSP.model;
 
+import java.time.LocalDate;
+import java.util.Date;
+
+import it.fastweb.editSP.config.Utility;
+
 public class WorkOrderSP {
 
 	private String rco_id;
-	private String identificativo;
-
+	private String identificativo;            // WO_ID
+	private String azione_preimpostata;
 	private String tech;
-	private String cellulare;
+	private String form;
+	private String account_no;
+	private String nome_wo;
 	private String order_id;
-	private String attuale_stato;
-	private String attuale_codice_attesa;
+	private String segmento_cliente;
+	private String cellulare;
+	private String attuale_stato;              // Stato_Attuale
+	private String attuale_codice_attesa;      // CDA_Attuale
 	private String attuale_dett_codice_attesa;
-	private String attuale_codice_chiusura;
+	private String attuale_codice_chiusura;    // CDC_Attuale
 	private String attuale_dett_codice_chiusura;
-	private String nuovo_stato;
-	private String nuovo_codice_attesa;
-	private String nuovo_dett_codice_attesa;
+	private String nuovo_stato;                // Stato_Nuovo
+	private String nuovo_codice_attesa;        // CDA_Nuovo
+	private String nuovo_dett_codice_attesa;   
 	private String nuovo_codice_chiusura;
 	private String nuovo_dett_codice_chiusura;
 	private String note_pm;
-	
+	// to trace the status of request of Remedy
+	private boolean esito;
+	private Date data_esito;
+	private String esito_dettagli;
+	private Date data_inserimento;
+
 	private String guid;
-	private String account_no;
+
 	private String process_CFG_ID;
 	private String fo_ID;
 	private String process_ID;
 	private String nome_FO;
 	private String processo_wo;
-	private String order_ID;
+
 	private String site_ID;
-	private String nome_wo;
+
 	private String automa;
 
 	// Data to add - Now are static
@@ -38,14 +52,9 @@ public class WorkOrderSP {
 	private String nuovo_WO_codice_attesa;
 	private String nuovo_WO_codice_attesa_precedente;
 	private String nuovo_WO_dett_codice_attesa;
-	
-	
-	// to trace the status of request of Remedy
+
 	private String esito_message;
-	private String esito_dettagli;
-	private boolean esito;
-	
-	
+
 	// Details to be dinamically load 
 	private String stato;
 	private String codice_attesa;
@@ -53,37 +62,76 @@ public class WorkOrderSP {
 	private String dettaglio_codice_attesa;
 	private String dettaglio_codice_chiusura;
 	private String codice_transizione;
-	
-	
-	
-	
-	
-	//
-	
-	
-	
-	
+
 	public WorkOrderSP() {
 		super();
 	}
-	
-	//
-	
-	
-	
-	//
 
-	public WorkOrderSP(String rco_id, String identificativo, String tech, 
-			String attuale_stato, String attuale_codice_attesa, String attuale_dett_codice_attesa,
-			String attuale_codice_chiusura, String attuale_dett_codice_chiusura, String nuovo_stato,
-			String nuovo_codice_attesa, String nuovo_dett_codice_attesa, String nuovo_codice_chiusura,
-			String nuovo_dett_codice_chiusura, String note_pm, String automa, String nuovo_WO_nome, String nuovo_WO_stato,
-			String nuovo_WO_codice_attesa, String nuovo_WO_codice_attesa_precedente,
-			String nuovo_WO_dettaglio_codice_attesa,String cellulare, String order_id) {
+	public WorkOrderSP(String rco_id, 
+			String identificativo, 
+			String azione_preimpostata,
+			String tech, 
+			String form,
+			String account_no,
+			String nome_wo,
+			String segmento_cliente,
+			String attuale_stato, 
+			String attuale_codice_attesa,
+			String attuale_dett_codice_attesa,
+			String attuale_codice_chiusura,
+			String attuale_dett_codice_chiusura,
+			String nuovo_stato,
+			String nuovo_codice_attesa,
+			String nuovo_dett_codice_attesa,
+			String nuovo_codice_chiusura,
+			String nuovo_dett_codice_chiusura,
+			String note_pm,
+			String automa,
+			String nuovo_WO_nome,
+			String nuovo_WO_stato,
+			String nuovo_WO_codice_attesa,
+			String nuovo_WO_codice_attesa_precedente,
+			String nuovo_WO_dettaglio_codice_attesa,
+			String cellulare, 
+			String order_id) {
+		/*
+		 * private String rco_id;
+	private String identificativo;            // WO_ID
+	private String azione_preimpostata;
+	private String tech;
+	private String form;
+	private String account_no;
+	private String nome_wo;
+	private String order_id;
+	private String segmento_cliente;
+	private String cellulare;
+	private String attuale_stato;              // Stato_Attuale
+	private String attuale_codice_attesa;      // CDA_Attuale
+	private String attuale_dett_codice_attesa;
+	private String attuale_codice_chiusura;    // CDC_Attuale
+	private String attuale_dett_codice_chiusura;
+	private String nuovo_stato;                // Stato_Nuovo
+	private String nuovo_codice_attesa;        // CDA_Nuovo
+	private String nuovo_dett_codice_attesa;   
+	private String nuovo_codice_chiusura;
+	private String nuovo_dett_codice_chiusura;
+	private String note_pm;
+	// to trace the status of request of Remedy
+	private boolean esito;
+	private Date data_esito;
+	private String esito_dettagli;
+	private Date data_inserimento;
+		 */
 		super();
 		this.setRco_id(rco_id);
 		this.setIdentificativo(identificativo);
 		this.setTech(tech);
+		this.setAzione_preimpostata(azione_preimpostata);
+		this.setTech(tech); 
+		this.setForm(form);
+		this.setAccount_no(account_no);
+		this.setNome_wo(nome_wo);
+		this.setSegmento_cliente(segmento_cliente);
 		
 		this.setAttuale_stato(attuale_stato);
 		this.setAttuale_codice_attesa(attuale_codice_attesa);
@@ -91,22 +139,22 @@ public class WorkOrderSP {
 		this.setAttuale_codice_chiusura(attuale_codice_chiusura);
 		this.setAttuale_dett_codice_chiusura(attuale_dett_codice_chiusura);
 		this.setNuovo_stato(nuovo_stato);
-		
+
 		this.setNuovo_codice_attesa(nuovo_codice_attesa);
 		this.setNuovo_dett_codice_attesa(nuovo_dett_codice_attesa);
 		this.setNuovo_codice_chiusura(nuovo_codice_chiusura);
 		this.setNuovo_dett_codice_chiusura(nuovo_dett_codice_chiusura);
-        this.setNote_pm(note_pm);
-        this.setAutoma(automa);
+		this.setNote_pm(note_pm);
+		this.setAutoma(automa);
 		this.setNuovo_WO_nome(nuovo_WO_nome);
 		this.setNuovo_WO_stato(nuovo_WO_stato);
-		
+
 		this.setNuovo_WO_codice_attesa(nuovo_WO_codice_attesa_precedente);
 		this.setNuovo_WO_codice_attesa_precedente(nuovo_WO_codice_attesa_precedente);
 		this.setNuovo_WO_dett_codice_attesa(nuovo_WO_dettaglio_codice_attesa);
 		this.setCellulare(cellulare);
 		this.setOrder_id(order_id);
-		
+
 		this.setEsito(false);
 		this.setEsito_message("");
 		this.setEsito_dettagli("");
@@ -390,14 +438,6 @@ public class WorkOrderSP {
 		this.processo_wo = processo_wo;
 	}
 
-	public String getOrder_ID() {
-		return order_ID;
-	}
-
-	public void setOrder_ID(String order_ID) {
-		this.order_ID = order_ID;
-	}
-
 	public String getSite_ID() {
 		return site_ID;
 	}
@@ -469,7 +509,7 @@ public class WorkOrderSP {
 	public void setCodice_transizione(String codice_transizione) {
 		this.codice_transizione = codice_transizione;
 	}
-	
+
 	/*
 	 * Se lo stato atteso è diverso da quello che si trova,
 	 * o il codice (o dettaglio) di attesa/chiusura sono diversi, si restituisce errore.
@@ -489,7 +529,7 @@ public class WorkOrderSP {
 				&& this.codice_attesa != null 
 				&& !this.codice_attesa.equals(this.attuale_codice_attesa))
 			gestibile = false;
-		
+
 		if(this.attuale_dett_codice_attesa != null 
 				&& !this.attuale_dett_codice_attesa.isEmpty()
 				&& this.dettaglio_codice_attesa != null
@@ -501,14 +541,14 @@ public class WorkOrderSP {
 				&& this.codice_chiusura != null
 				&& !this.codice_chiusura.equals(this.attuale_codice_chiusura))
 			gestibile = false;
-			
+
 		if(this.attuale_dett_codice_chiusura != null 
 				&& !this.attuale_dett_codice_chiusura.isEmpty()
 				&& this.dettaglio_codice_chiusura != null
 				&& !this.dettaglio_codice_chiusura.equals(this.attuale_dett_codice_chiusura))
 			gestibile = false;
-		
-		
+
+
 		if(!gestibile)
 		{
 			//logger.info("Ticket non gestibile. ID: "+this.identificativo);
@@ -516,10 +556,63 @@ public class WorkOrderSP {
 			this.esito_dettagli = "Non gestibile";
 			this.esito = false;
 		}
-		
+
 		return gestibile;
 	}
 
-	
+	public String getAzione_preimpostata() {
+		return azione_preimpostata;
+	}
+
+	public void setAzione_preimpostata(String azione_preimpostata) {
+		this.azione_preimpostata = azione_preimpostata;
+	}
+
+	public String getForm() {
+		return form;
+	}
+
+	public void setForm(String form) {
+		this.form = form;
+	}
+
+	public String getSegmento_cliente() {
+		return segmento_cliente;
+	}
+
+	public void setSegmento_cliente(String segmento_cliente) {
+		this.segmento_cliente = segmento_cliente;
+	}
+
+	public LocalDate getData_esito() {
+		LocalDate localDate;
+		if (data_esito != null) {
+			localDate = Utility.convertDateToLocalDate(data_esito);
+		}else {
+			localDate = null;
+		}
+		return localDate;
+	}
+
+	public void setData_esito(Date data_esito) {
+		this.data_esito = data_esito;
+	}
+
+	public LocalDate getData_inserimento() {
+		LocalDate localDate;
+		if (data_inserimento != null) {
+			localDate = Utility.convertDateToLocalDate(data_inserimento);
+		}else {
+			localDate = null;
+		}
+		return localDate;
+		
+	}
+
+	public void setData_inserimento(Date data_inserimento) {
+		this.data_inserimento = data_inserimento;
+	}
+
+
 
 }

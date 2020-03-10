@@ -17,7 +17,7 @@ import com.bmc.arsys.api.ARServerUser;
 public class SessionRemedyConfiguration extends Common_configuration {
 
 	 //private SessionRemedyClient sessionRemedy;
-	 private static Logger logger = LoggerFactory.getLogger(SessionRemedyConfiguration.class);
+	 static Logger logger = LoggerFactory.getLogger(SessionRemedyConfiguration.class);
 	 private String servername ;
 	 private String username;
 	 private String password;

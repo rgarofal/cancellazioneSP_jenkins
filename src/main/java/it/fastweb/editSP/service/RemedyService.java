@@ -10,6 +10,7 @@ import it.fastweb.editSP.model.WorkOrderSP;
 public class RemedyService {
 	private SessionRemedyConfiguration sessionRemedy;
 	private RemedyDao remedy_dao;
+	private static Boolean config_test = false;
 
 	
 	private static Logger logger = LoggerFactory.getLogger(RemedyService.class);
@@ -23,7 +24,7 @@ public class RemedyService {
 
 	public WorkOrderSP process_WO_SP(WorkOrderSP wo_sp_to_edit) throws Exception {
 		logger.info("*****Sto processando: " + wo_sp_to_edit.getIdentificativo());
-        Boolean config_test = false;
+        
 		if((wo_sp_to_edit.getIdentificativo() != null && !wo_sp_to_edit.getIdentificativo().isEmpty()) 
 				&&(wo_sp_to_edit.getTech() != null && !wo_sp_to_edit.getTech().isEmpty())) {
 
@@ -34,9 +35,10 @@ public class RemedyService {
 				if(wo_sp_to_edit.gestibilita())
 				{
 					if (config_test) {
-						logger.info("TEST aggiornamento");
+						logger.info("TEST aggiornamento ticket ");
 					} else {
-						// E' un ticket gestibile ed è possibile aggiornarlo. Quindi lancio l'aggiornamento.
+						// E' un ticket gestibile ed ï¿½ possibile aggiornarlo. Quindi lancio l'aggiornamento.
+						logger.info("aggiornamento ticket ");
 						remedy_dao.aggiorna(wo_sp_to_edit);
 					}
 					

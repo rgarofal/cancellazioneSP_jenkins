@@ -66,6 +66,8 @@ public class DataConfig extends Common_configuration {
 
 			conn = (DriverManager.getConnection(DB_URL, USER, PASS));
 			logger.info("Connessione al Database configurata");
+			logger.info("Database = " + DB_URL);
+			logger.info("username" + USER);
 		} catch (FileNotFoundException e) {
 			logger.error("File di configurazione non trovato.");
 			throw e;
@@ -107,6 +109,7 @@ public class DataConfig extends Common_configuration {
 	}
 
 	public void close_conn() throws SQLException {
+		logger.info("Chiusura connessione Database");
 		conn.close();
 	}
 	

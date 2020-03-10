@@ -22,6 +22,7 @@ public class RemedyDao {
 
 	private static ARServerUser ctx;
 	private static Logger logger = LoggerFactory.getLogger(RemedyDao.class);
+	private static Boolean config_test = false;
 
 	public RemedyDao(ARServerUser session) {
 		super();
@@ -47,68 +48,99 @@ public class RemedyDao {
 		return "";
 	}
 
-	
+
 	/*
-	 * In caso di tecnologia FTTS, è necessario creare esplicitamente la transizione in SP.
+	 * In caso di tecnologia FTTS, ï¿½ necessario creare esplicitamente la transizione in SP.
 	 * 
 	 */
 	private boolean creaTransizioneFTTS(WorkOrderSP workorder_da_processare) throws ARException
 	{
-			String schemaName = "SP_SLU_WO_TRANSIZIONI";
-			Entry entry = new Entry();
-			
-			int[] intArray = new int[10];
-			intArray[0] = 7;	// Stato
-			intArray[1] = 2;	// Utente
-			intArray[2] = 8;	// Nota -> .
-			intArray[3] = 700000086;	// WO ID
-			intArray[4]	= 800000023;	// Codice di attesa
-			intArray[5]	= 800000223;	// Dettaglio Codice Attesa
-			intArray[6]	= 800000005;	// Codice di Chiusura
-			intArray[7]	= 800000205;	// Dettaglio Codice Chiusura
-			intArray[8]	= 802000001;	// Order ID
-			intArray[9]	= 800000542;	// GUID
-			
-					
-			entry.put(intArray[1],new Value(workorder_da_processare.getAutoma()));
-			entry.put(intArray[2],new Value("."));
-			entry.put(intArray[3],new Value(workorder_da_processare.getIdentificativo()));	
-			entry.put(intArray[8],new Value(workorder_da_processare.getOrder_ID()));
-			entry.put(intArray[9],new Value(workorder_da_processare.getGuid()));
-			
-			if(workorder_da_processare.getNuovo_stato() != null && !workorder_da_processare.getNuovo_stato().isEmpty())
-				entry.put(intArray[0],new Value(workorder_da_processare.getNuovo_stato()));
-			else
-				entry.put(intArray[0],new Value(workorder_da_processare.getStato()));
-			
-			if(workorder_da_processare.getNuovo_codice_attesa() != null && !workorder_da_processare.getNuovo_codice_attesa().isEmpty())
-				entry.put(intArray[4],new Value(workorder_da_processare.getNuovo_codice_attesa()));
-			
-			if(workorder_da_processare.getNuovo_dett_codice_attesa() != null && !workorder_da_processare.getNuovo_dett_codice_attesa().isEmpty())
-				entry.put(intArray[5],new Value(workorder_da_processare.getNuovo_dett_codice_attesa()));
-			
-			if(workorder_da_processare.getNuovo_codice_chiusura() != null && !workorder_da_processare.getNuovo_codice_chiusura().isEmpty())
-				entry.put(intArray[6],new Value(workorder_da_processare.getNuovo_codice_chiusura()));
-			
-			if(workorder_da_processare.getNuovo_dett_codice_chiusura() != null && !workorder_da_processare.getNuovo_dett_codice_chiusura().isEmpty())
-				entry.put(intArray[7],new Value(workorder_da_processare.getNuovo_dett_codice_chiusura()));
-			
-			workorder_da_processare.setCodice_transizione(ctx.createEntry(schemaName, entry));			
-    		
+		String schemaName = "SP_SLU_WO_TRANSIZIONI";
+		Entry entry = new Entry();
+
+		int[] intArray = new int[10];
+		intArray[0] = 7;	// Stato
+		intArray[1] = 2;	// Utente
+		intArray[2] = 8;	// Nota -> .
+		intArray[3] = 700000086;	// WO ID
+		intArray[4]	= 800000023;	// Codice di attesa
+		intArray[5]	= 800000223;	// Dettaglio Codice Attesa
+		intArray[6]	= 800000005;	// Codice di Chiusura
+		intArray[7]	= 800000205;	// Dettaglio Codice Chiusura
+		intArray[8]	= 802000001;	// Order ID
+		intArray[9]	= 800000542;	// GUID
+
+
+		entry.put(intArray[1],new Value(workorder_da_processare.getAutoma()));
+		entry.put(intArray[2],new Value("."));
+		entry.put(intArray[3],new Value(workorder_da_processare.getIdentificativo()));	
+		entry.put(intArray[8],new Value(workorder_da_processare.getOrder_id()));
+		entry.put(intArray[9],new Value(workorder_da_processare.getGuid()));
+
+		if(workorder_da_processare.getNuovo_stato() != null && !workorder_da_processare.getNuovo_stato().isEmpty()) {
+			entry.put(intArray[0],new Value(workorder_da_processare.getNuovo_stato()));
+		}else {
+			entry.put(intArray[0],new Value(workorder_da_processare.getStato()));
+		}
+		if(workorder_da_processare.getNuovo_codice_attesa() != null && !workorder_da_processare.getNuovo_codice_attesa().isEmpty()) {
+			entry.put(intArray[4],new Value(workorder_da_processare.getNuovo_codice_attesa()));
+		}
+		if(workorder_da_processare.getNuovo_dett_codice_attesa() != null && !workorder_da_processare.getNuovo_dett_codice_attesa().isEmpty()) {
+			entry.put(intArray[5],new Value(workorder_da_processare.getNuovo_dett_codice_attesa()));
+		}
+		if(workorder_da_processare.getNuovo_codice_chiusura() != null && !workorder_da_processare.getNuovo_codice_chiusura().isEmpty()) {
+			entry.put(intArray[6],new Value(workorder_da_processare.getNuovo_codice_chiusura()));
+		}
+		if(workorder_da_processare.getNuovo_dett_codice_chiusura() != null && !workorder_da_processare.getNuovo_dett_codice_chiusura().isEmpty()) {
+			entry.put(intArray[7],new Value(workorder_da_processare.getNuovo_dett_codice_chiusura()));
+		}
+		if(config_test) {
+			logger.info("TEST Transazione Remedy Codice Chiusura e Codice Attesa ");
+			workorder_da_processare.setCodice_transizione("REMEDY_TRANS_MOCK");
+		}else {
+			logger.info("Transazione Remedy Codice Chiusura e Codice Attesa ");
+			workorder_da_processare.setCodice_transizione(ctx.createEntry(schemaName, entry));
+		}
+
 		return true;	
 	}
-	
+
 	/*
-	 * C'è bisogno sia di creare il wo successivo, sia la sua relativa transizione.
+	 * C'ï¿½ bisogno sia di creare il wo successivo, sia la sua relativa transizione.
 	 * 
 	 */
 	public boolean creaWoSuccessivo(WorkOrderSP workorder_da_processare)
 	{
 		// Creo l'oggetto relativo al nuovo wo
-		WorkOrderSP nuovo_elemento = new WorkOrderSP("", "",workorder_da_processare.getTech(),"", "", "",	
-				"", "",	"", "", "",	"", "","", workorder_da_processare.getAutoma(), "", "", "", "", "", "", "");
-		
-		
+		WorkOrderSP nuovo_elemento = new WorkOrderSP(
+				"", //rco_id
+				"", //identificativo
+				"", //azione_preimpostata
+				workorder_da_processare.getTech(),
+				"", //form
+				"", //acoount_no
+				"",	// nome_wo
+				"", // segmento_cliente
+				"", // attuale_stato
+				"", // attuale_codice_attesa
+				"", // attuale_dett_codice_attesa
+				"", // attuale_codice_chiusura
+				"", // attuale_dett_codice_chiusura
+				"", // nuovo_stato
+				"", // nuovo_codice_attesa
+				"", // nuovo_dett_codice_attesa
+				"", // nuovo_codice_chiusura
+				"", // nuovo_dett_codice_chiusura
+				"", // note_pm
+				workorder_da_processare.getAutoma(),
+				"", // nuovo_WO_nome
+				"", // nuovo_WO_stato
+				"", // nuovo_WO_codice_attesa
+				"", // nuovo_WO_codice_attesa_precedente
+				"", // nuovo_WO_dettaglio_codice_attesa
+				"", // cellulare
+				""  // order_id
+				);
 
 		if(!workorder_da_processare.getNuovo_WO_stato().isEmpty() && !workorder_da_processare.getNuovo_WO_codice_attesa().isEmpty())
 		{
@@ -132,7 +164,7 @@ public class RemedyDao {
 				intArray[14] = 802000001;	// Order ID			
 				intArray[15] = 802000002;	// Site ID
 
-				// Passaggio di tutti i parametri (anche se può essere superfluo)
+				// Passaggio di tutti i parametri (anche se puï¿½ essere superfluo)
 				nuovo_elemento.setAccount_no(workorder_da_processare.getAccount_no());
 				nuovo_elemento.setProcess_CFG_ID( workorder_da_processare.getProcess_CFG_ID());
 				nuovo_elemento.setFo_ID(workorder_da_processare.getFo_ID());
@@ -140,7 +172,7 @@ public class RemedyDao {
 				nuovo_elemento.setProcess_ID( workorder_da_processare.getProcess_ID());
 				nuovo_elemento.setProcesso_wo(workorder_da_processare.getProcesso_wo());
 				nuovo_elemento.setAutoma(workorder_da_processare.getAutoma());
-				nuovo_elemento.setOrder_id(workorder_da_processare.getOrder_ID());
+				nuovo_elemento.setOrder_id(workorder_da_processare.getOrder_id());
 				nuovo_elemento.setSite_ID(workorder_da_processare.getSite_ID());
 
 
@@ -151,8 +183,9 @@ public class RemedyDao {
 				entry.put(intArray[3],new Value(nuovo_elemento.getFo_ID()));
 				entry.put(intArray[4],new Value(workorder_da_processare.getNome_wo()));	
 
-				if(!workorder_da_processare.getNuovo_WO_codice_attesa_precedente().isEmpty())
+				if(!workorder_da_processare.getNuovo_WO_codice_attesa_precedente().isEmpty()) {
 					entry.put(intArray[5],new Value(workorder_da_processare.getNuovo_WO_codice_attesa_precedente()));
+				}
 
 				entry.put(intArray[6],new Value(workorder_da_processare.getNuovo_WO_codice_attesa()));
 				entry.put(intArray[7],new Value(workorder_da_processare.getNuovo_WO_nome()));
@@ -161,18 +194,24 @@ public class RemedyDao {
 				entry.put(intArray[10],new Value(nuovo_elemento.getProcess_ID()));
 				entry.put(intArray[11],new Value(nuovo_elemento.getProcesso_wo()));
 
-				if(!workorder_da_processare.getNuovo_WO_dett_codice_attesa().isEmpty())
+				if(!workorder_da_processare.getNuovo_WO_dett_codice_attesa().isEmpty()) {
 					entry.put(intArray[12],new Value(workorder_da_processare.getNuovo_WO_dett_codice_attesa()));
-
+				}
 				entry.put(intArray[13],new Value(nuovo_elemento.getAutoma()));
-				entry.put(intArray[14],new Value(nuovo_elemento.getOrder_ID()));
+				entry.put(intArray[14],new Value(nuovo_elemento.getOrder_id()));
 				entry.put(intArray[15],new Value(nuovo_elemento.getSite_ID()));
+				if ( config_test) {
+					logger.info("TEST WO successivo creato ");
+					nuovo_elemento.setIdentificativo("IDENTIF_WO_MOCK");
+				}else {
+					nuovo_elemento.setIdentificativo(ctx.createEntry(getForm(nuovo_elemento.getTech()), entry));  
+					logger.info("WO successivo creato: " +nuovo_elemento.getIdentificativo());
+				}
 
-				nuovo_elemento.setIdentificativo(ctx.createEntry(getForm(nuovo_elemento.getTech()), entry));  
 
-				logger.debug("WO successivo creato: " +nuovo_elemento.getIdentificativo());
 
-				// Una volta creato l'elemento, è necessario reperire i campi impostati, come il GUID
+                logger.info("Carico informazioni per il nuovo WO");;
+				// Una volta creato l'elemento, ï¿½ necessario reperire i campi impostati, come il GUID
 				caricaDettagliWO(nuovo_elemento);
 
 				int[] intArrayTransizione = new int[17];
@@ -207,10 +246,10 @@ public class RemedyDao {
 				transizione.put(intArrayTransizione[2],new Value("."));
 				transizione.put(intArrayTransizione[3],new Value(nuovo_elemento.getIdentificativo()));
 				transizione.put(intArrayTransizione[4],new Value(workorder_da_processare.getNuovo_codice_chiusura()));
-				
-//				if(!workorder_da_processare.nuovo_WO_dettaglio_codice_attesa.isEmpty())
-//					transizione.put(intArrayTransizione[5],new Value(""));
-				
+
+				//				if(!workorder_da_processare.nuovo_WO_dettaglio_codice_attesa.isEmpty())
+				//					transizione.put(intArrayTransizione[5],new Value(""));
+
 				transizione.put(intArrayTransizione[6],new Value(nuovo_elemento.getFo_ID()));
 				transizione.put(intArrayTransizione[7],new Value(nuovo_elemento.getProcess_ID()));
 				transizione.put(intArrayTransizione[8],new Value(nuovo_elemento.getNome_FO()));
@@ -218,15 +257,19 @@ public class RemedyDao {
 				transizione.put(intArrayTransizione[10],new Value(workorder_da_processare.getNome_wo()));	             
 				transizione.put(intArrayTransizione[11],new Value(workorder_da_processare.getNuovo_stato()));
 				transizione.put(intArrayTransizione[12],new Value(workorder_da_processare.getNuovo_WO_codice_attesa()));
-				
-				if(!workorder_da_processare.getNuovo_WO_dett_codice_attesa().isEmpty())
+
+				if(!workorder_da_processare.getNuovo_WO_dett_codice_attesa().isEmpty()) {
 					transizione.put(intArrayTransizione[13],new Value(workorder_da_processare.getNuovo_WO_dett_codice_attesa()));
-				
+				}
 				transizione.put(intArrayTransizione[14],new Value(nuovo_elemento.getGuid()));
-				transizione.put(intArrayTransizione[15],new Value(nuovo_elemento.getOrder_ID()));		
-
-				ctx.setEntry(form, entries.get(0).getEntryId(), transizione, null, 0);
-
+				transizione.put(intArrayTransizione[15],new Value(nuovo_elemento.getOrder_id()));		
+                if(config_test) {
+                	logger.info("TEST Configurazione transizione per SP_SLU_WO_TRANSIZIONI");
+                }else {
+                	logger.info("Configurazione transizione per SP_SLU_WO_TRANSIZIONI");
+                	ctx.setEntry(form, entries.get(0).getEntryId(), transizione, null, 0);
+                }
+				
 				return true;
 			}
 			catch (ARException e) {   
@@ -238,11 +281,11 @@ public class RemedyDao {
 			return false;	
 	}
 
-	
-	
-	
-	
-	
+
+
+
+
+
 	/*
 	 * Le note PM vengono gestite in maniera leggermente differente tra le tecnologie
 	 * 
@@ -253,15 +296,15 @@ public class RemedyDao {
 
 			int[] intArray = new int[3];
 			intArray[0] = 800000479;	// Note PM - ADSL e SUBULL
-			
-			
+
+
 			String schemaName = "";
 			Entry entry = new Entry();
 
 			if(workorder_da_processare.getTech().equalsIgnoreCase("SUBULL"))
 			{
 				intArray[1] = 707000080;	// Cliente contattato
-//				intArray[2] = 800000478;	// Note - Solo in SUBULL
+				//				intArray[2] = 800000478;	// Note - Solo in SUBULL
 				intArray[2] = 800000479;	// Note PM - Solo in SUBULL
 				schemaName = "SLU:CHK CALL CON RIS";
 			}
@@ -277,7 +320,7 @@ public class RemedyDao {
 				intArray[2] = 1;			// Per passare qualcosa
 				schemaName = "SP_HSL_J_WOCheckCall";
 			}
-			
+
 			String queryString = "'WO ID' = \"" +workorder_da_processare.getIdentificativo()+"\"";  
 			QualifierInfo qual = ctx.parseQualification(schemaName, queryString);   
 			List<Entry> entries = ctx.getListEntryObjects(schemaName, qual, 0, 0, null, null, false, null); 
@@ -288,14 +331,18 @@ public class RemedyDao {
 				if(workorder_da_processare.getNote_pm() != null && !workorder_da_processare.getNote_pm().isEmpty())
 				{
 					entry = ctx.getEntry(schemaName, entries.get(0).getEntryId(), intArray);
-					
+
 					Value note = entry.get(intArray[0]);
 					String note_precedenti = note.toString();
-									
+
 					entry.put(intArray[0],new Value(workorder_da_processare.getNote_pm()+ "\n\n" +note_precedenti));
 					entry.put(intArray[1],new Value("0"));
-					
-					ctx.setEntry(schemaName, entries.get(0).getEntryId(), entry, null, 0);
+					if (config_test) {
+						logger.info("TEST setEntry modifica Note PM");
+					}else {
+						logger.info("setEntry modifica Note PM");
+						ctx.setEntry(schemaName, entries.get(0).getEntryId(), entry, null, 0);
+					}
 					return true;
 				}
 
@@ -305,13 +352,13 @@ public class RemedyDao {
 		catch (ARException e)
 		{  
 			// In alcuni casi (come nel form ADSL e WS), l'eccezione non provoca errori: le note vengono scritte comunque.
-			// Per questo è necessario gestire il blocco try-catch.
+			// Per questo ï¿½ necessario gestire il blocco try-catch.
 			if(
 					(!workorder_da_processare.getTech().equalsIgnoreCase("ADSL") && !e.getMessage().startsWith("ERROR (10000):"))
 					&& (!workorder_da_processare.getTech().equalsIgnoreCase("ADSL_WS") && !e.getMessage().startsWith("ERROR (552):"))
-				)
+					)
 			{
-				
+
 				workorder_da_processare.setEsito(false);
 				workorder_da_processare.setEsito_message( "MOD_SP_KO");
 
@@ -320,7 +367,9 @@ public class RemedyDao {
 				return false;
 			}
 			else
+			{
 				return true;
+			}
 		}            
 	}
 	/*
@@ -363,13 +412,13 @@ public class RemedyDao {
 
 			Entry entry = new Entry();
 
-			if(workorder_da_processare.getTech().equalsIgnoreCase("SUBULL"))
+			if(workorder_da_processare.getTech().equalsIgnoreCase("SUBULL")) {
 				entry = ctx.getEntry(getForm(workorder_da_processare.getTech()), workorder_da_processare.getIdentificativo(), intArray);
-			else if(workorder_da_processare.getTech().equalsIgnoreCase("ADSL"))
+			}else if(workorder_da_processare.getTech().equalsIgnoreCase("ADSL")) {
 				entry = ctx.getEntry(getForm(workorder_da_processare.getTech()), workorder_da_processare.getIdentificativo(), intArray_ADSL_FIBRA_WS);
-			else if(workorder_da_processare.getTech().equalsIgnoreCase("ADSL_WS"))
+			}else if(workorder_da_processare.getTech().equalsIgnoreCase("ADSL_WS")) {
 				entry = ctx.getEntry(getForm(workorder_da_processare.getTech()), workorder_da_processare.getIdentificativo(), intArray_ADSL_FIBRA_WS);
-
+			}
 			for (Integer fieldID : entry.keySet())
 			{  
 				Value val = entry.get(fieldID);
@@ -381,30 +430,31 @@ public class RemedyDao {
 					if (field instanceof CharacterField)
 					{ 
 
-						if(field.getName().equals("GUID"))
+						if(field.getName().equals("GUID")) {
 							workorder_da_processare.setGuid(data_entry);
-						else if(field.getName().equals("Account no"))
+						}else if(field.getName().equals("Account no")) {
 							workorder_da_processare.setAccount_no(data_entry);
-						else if(field.getName().equals("Process CFG ID"))
+						}else if(field.getName().equals("Process CFG ID")) {
 							workorder_da_processare.setProcess_CFG_ID(data_entry);
-						else if(field.getName().equals("FO ID"))
+						}else if(field.getName().equals("FO ID")) {
 							workorder_da_processare.setFo_ID(data_entry);
-						else if(field.getName().equals("Process ID"))
+						}else if(field.getName().equals("Process ID")) {
 							workorder_da_processare.setProcess_ID(data_entry);
-						else if(field.getName().equals("Nome FO"))
+						}else if(field.getName().equals("Nome FO")) {
 							workorder_da_processare.setNome_FO(data_entry);
-						else if(field.getName().equals("Processo"))
+						}else if(field.getName().equals("Processo")) {
 							workorder_da_processare.setProcesso_wo(data_entry);
-						else if(field.getName().equals("Codice di attesa"))
+						}else if(field.getName().equals("Codice di attesa")) {
 							workorder_da_processare.setCodice_attesa(data_entry);
-						else if(field.getName().equals("Codice di Chiusura"))
+						}else if(field.getName().equals("Codice di Chiusura")) {
 							workorder_da_processare.setCodice_chiusura(data_entry);
-						else if(field.getName().equals("Dettaglio Codice Attesa"))
+						}else if(field.getName().equals("Dettaglio Codice Attesa")) {
 							workorder_da_processare.setDettaglio_codice_attesa(data_entry);
-						else if(field.getName().equals("Dettaglio Codice Chiusura"))
+						}else if(field.getName().equals("Dettaglio Codice Chiusura")) {
 							workorder_da_processare.setDettaglio_codice_chiusura(data_entry);
-						else if(field.getName().equals("Nome_WO"))
+						}else if(field.getName().equals("Nome_WO")) {
 							workorder_da_processare.setNome_wo(data_entry);
+						}
 					}
 					else if (field instanceof SelectionField)
 					{  
@@ -426,10 +476,11 @@ public class RemedyDao {
 					}
 					else 
 					{  
-						if(field.getName().equals("Order ID"))
-							workorder_da_processare.setOrder_ID(data_entry);
-						else if(field.getName().equals("Site ID"))
+						if(field.getName().equals("Order ID")) {
+							workorder_da_processare.setOrder_id(data_entry);
+						}else if(field.getName().equals("Site ID")) {
 							workorder_da_processare.setSite_ID(data_entry);
+						}
 					}  
 				}
 			}
@@ -453,14 +504,14 @@ public class RemedyDao {
 			{
 				String queryString = "'Order ID' = " +workorder_da_processare.getOrder_id() +"";  
 				QualifierInfo qual = ctx.parseQualification("SP_HSL_ORDER_ALL", queryString);
-				// entries è solo l'elenco dei risultati che matchano la query effettuata. Ma è necessario prelevare tutte le altre info con getEntry()
+				// entries ï¿½ solo l'elenco dei risultati che matchano la query effettuata. Ma ï¿½ necessario prelevare tutte le altre info con getEntry()
 				List<Entry> entries = ctx.getListEntryObjects("SP_HSL_ORDER_ALL", qual, 0, 0, null, null, false, null); 
 
 				int[] intArray = new int[2];
 				intArray[0] = 800011127; // Cellulare Corretto WS
 				intArray[1] = 800011126; // Cellulare Corretto WS
 
-				// Se la lista dei risultati è piena, allora posso prelevarmi l'elemento che mi interessa.
+				// Se la lista dei risultati ï¿½ piena, allora posso prelevarmi l'elemento che mi interessa.
 				if(entries.size() > 0)
 				{
 					Entry entry = ctx.getEntry("SP_HSL_ORDER_ALL", entries.get(0).getEntryId(), intArray);
@@ -471,7 +522,12 @@ public class RemedyDao {
 					//					String numero_precedente = entry.get(800011126).toString();
 					//					if(numero_precedente.isEmpty())
 					entry.put(800011126 ,new Value(workorder_da_processare.getCellulare()));
-					ctx.setEntry("SP_HSL_ORDER_ALL", entries.get(0).getEntryId(), entry, null, 0);
+					if (config_test) {
+						logger.info("TEST setEntry SP_HSL_ORDER_ALL");
+					} else {
+						logger.info("setEntry SP_HSL_ORDER_ALL");
+						ctx.setEntry("SP_HSL_ORDER_ALL", entries.get(0).getEntryId(), entry, null, 0);
+					}
 				}
 
 			}
@@ -488,31 +544,37 @@ public class RemedyDao {
 
 			Entry entry = ctx.getEntry(getForm(workorder_da_processare.getTech()), workorder_da_processare.getIdentificativo(), intArray);
 
-			// Verifica se c'è il cambio stato
-			if(workorder_da_processare.getNuovo_stato() != null && !workorder_da_processare.getNuovo_stato().isEmpty())
+			// Verifica se c'ï¿½ il cambio stato
+			if(workorder_da_processare.getNuovo_stato() != null && !workorder_da_processare.getNuovo_stato().isEmpty()) {
 				entry.put(intArray[0],new Value(workorder_da_processare.getNuovo_stato()));
+			}
 
-			// Verifica se c'è il cambio codice d'attesa
-			if(workorder_da_processare.getNuovo_codice_attesa() != null && !workorder_da_processare.getNuovo_codice_attesa().isEmpty())
+			// Verifica se c'ï¿½ il cambio codice d'attesa
+			if(workorder_da_processare.getNuovo_codice_attesa() != null && !workorder_da_processare.getNuovo_codice_attesa().isEmpty()) {
 				entry.put(intArray[1],new Value(workorder_da_processare.getNuovo_codice_attesa()));
-
-			// Verifica se c'è il cambio dettaglio codice d'attesa
-			if(workorder_da_processare.getNuovo_codice_attesa() != null && !workorder_da_processare.getNuovo_dett_codice_attesa().isEmpty())
+			}
+			// Verifica se c'ï¿½ il cambio dettaglio codice d'attesa
+			if(workorder_da_processare.getNuovo_codice_attesa() != null && !workorder_da_processare.getNuovo_dett_codice_attesa().isEmpty()) {
 				entry.put(intArray[2],new Value(workorder_da_processare.getNuovo_dett_codice_attesa()));
-
-			// Verifica se c'è il cambio codice di chiusura
+			}
+			// Verifica se c'ï¿½ il cambio codice di chiusura
 			if(workorder_da_processare.getNuovo_codice_chiusura() != null && !workorder_da_processare.getNuovo_codice_chiusura().isEmpty())
 			{
 				entry.put(intArray[3],new Value(workorder_da_processare.getNuovo_codice_chiusura()));
 				entry.put(intArray[1],new Value(""));
 			}
 
-			// Verifica se c'è il cambio dettaglio codice di chiusura
-			if(workorder_da_processare.getNuovo_dett_codice_chiusura() != null && !workorder_da_processare.getNuovo_dett_codice_chiusura().isEmpty())
+			// Verifica se c'ï¿½ il cambio dettaglio codice di chiusura
+			if(workorder_da_processare.getNuovo_dett_codice_chiusura() != null && !workorder_da_processare.getNuovo_dett_codice_chiusura().isEmpty()) {
 				entry.put(intArray[4],new Value(workorder_da_processare.getNuovo_dett_codice_chiusura()));
+			}
 
-			ctx.setEntry(getForm(workorder_da_processare.getTech()), workorder_da_processare.getIdentificativo(), entry, null, 0);
-
+			if (config_test) {
+				logger.info("TEST setEntry cambio codice");
+			} else {
+				logger.info("setEntry cambio codice");
+				ctx.setEntry(getForm(workorder_da_processare.getTech()), workorder_da_processare.getIdentificativo(), entry, null, 0);
+			}
 			if(modificaNotePM(workorder_da_processare))
 			{
 
@@ -535,41 +597,42 @@ public class RemedyDao {
 				if(caricaDettagliWO(workorder_da_processare) && verifica)
 				{
 
-					if((workorder_da_processare.getNuovo_stato() != null && !workorder_da_processare.getNuovo_stato().isEmpty() && !workorder_da_processare.getNuovo_stato().equals(workorder_da_processare.getStato())))
+					if((workorder_da_processare.getNuovo_stato() != null && !workorder_da_processare.getNuovo_stato().isEmpty() && !workorder_da_processare.getNuovo_stato().equals(workorder_da_processare.getStato()))) {
 						verifica = false;
-
-					if(workorder_da_processare.getNuovo_codice_attesa() != null && !workorder_da_processare.getNuovo_codice_attesa().isEmpty() && !workorder_da_processare.getNuovo_codice_attesa().equals(workorder_da_processare.getCodice_attesa()))
+					}
+					if(workorder_da_processare.getNuovo_codice_attesa() != null && !workorder_da_processare.getNuovo_codice_attesa().isEmpty() && !workorder_da_processare.getNuovo_codice_attesa().equals(workorder_da_processare.getCodice_attesa())) {
 						verifica = false;
-
-					if(workorder_da_processare.getNuovo_dett_codice_attesa() != null && !workorder_da_processare.getNuovo_dett_codice_attesa().isEmpty() && !workorder_da_processare.getNuovo_dett_codice_attesa().equals(workorder_da_processare.getDettaglio_codice_attesa()))
+					}
+					if(workorder_da_processare.getNuovo_dett_codice_attesa() != null && !workorder_da_processare.getNuovo_dett_codice_attesa().isEmpty() && !workorder_da_processare.getNuovo_dett_codice_attesa().equals(workorder_da_processare.getDettaglio_codice_attesa())) {
 						verifica = false;
-
-					if(workorder_da_processare.getNuovo_codice_chiusura() != null && !workorder_da_processare.getNuovo_dett_codice_attesa().isEmpty() && !workorder_da_processare.getNuovo_dett_codice_attesa().equals(workorder_da_processare.getCodice_chiusura()))
+					}
+					if(workorder_da_processare.getNuovo_codice_chiusura() != null && !workorder_da_processare.getNuovo_dett_codice_attesa().isEmpty() && !workorder_da_processare.getNuovo_dett_codice_attesa().equals(workorder_da_processare.getCodice_chiusura())) {
 						verifica = false;
-
-					if(workorder_da_processare.getNuovo_dett_codice_chiusura() != null && !workorder_da_processare.getNuovo_dett_codice_chiusura().isEmpty() && !workorder_da_processare.getNuovo_dett_codice_chiusura().equals(workorder_da_processare.getDettaglio_codice_chiusura()))
+					}
+					if(workorder_da_processare.getNuovo_dett_codice_chiusura() != null && !workorder_da_processare.getNuovo_dett_codice_chiusura().isEmpty() && !workorder_da_processare.getNuovo_dett_codice_chiusura().equals(workorder_da_processare.getDettaglio_codice_chiusura())) {
 						verifica = false;
-
-					// Se è entrato quì, vuol dire che verifica era true, cioè gli altri passi sono stati effettuati senza eccezioni.
-					// In questo caso verifica può essere false solo se non vengono rilevate le modifiche.
+					}
+					// Se ï¿½ entrato quï¿½, vuol dire che verifica era true, cioï¿½ gli altri passi sono stati effettuati senza eccezioni.
+					// In questo caso verifica puï¿½ essere false solo se non vengono rilevate le modifiche.
 					if(verifica)
 					{
 						workorder_da_processare.setEsito(true);
 						workorder_da_processare.setEsito_message("MOD_SP_OK");
-						if(!workorder_da_processare.getEsito_dettagli().isEmpty())
+						if(!workorder_da_processare.getEsito_dettagli().isEmpty()) {
 							workorder_da_processare.setEsito_dettagli(workorder_da_processare.getEsito_dettagli() +" - "+"Ok verifica cambio stato.");
-						else
+						}else {
 							workorder_da_processare.setEsito_dettagli("Ok");
+						}
 					}
 					else
 					{
 						workorder_da_processare.setEsito(false);
 						workorder_da_processare.setEsito_message( "MOD_SP_KO");
-						if(!workorder_da_processare.getEsito_dettagli().isEmpty())
+						if(!workorder_da_processare.getEsito_dettagli().isEmpty()) {
 							workorder_da_processare.setEsito_dettagli(workorder_da_processare.getEsito_dettagli() +" - "+"Errore rilevamento modifiche.");
-						else
+						}else {
 							workorder_da_processare.setEsito_dettagli("Errore rilevamento modifiche.");
-						
+						}
 
 						logger.error("Errore rilevamento modifiche. ID: " +workorder_da_processare.getIdentificativo());
 					}
@@ -578,14 +641,17 @@ public class RemedyDao {
 				{
 					workorder_da_processare.setEsito(false);
 					workorder_da_processare.setEsito_message( "MOD_SP_KO");
-					if(!workorder_da_processare.getEsito_dettagli().isEmpty())
+					if(!workorder_da_processare.getEsito_dettagli().isEmpty()) {
 						workorder_da_processare.setEsito_dettagli("Errore caricamento dettagli WO.");
-
+					}
 					return verifica;
 				}
 			}
 			else
+			{
 				verifica = false;
+			}
+
 
 			return verifica;
 		}
@@ -593,8 +659,9 @@ public class RemedyDao {
 		{  
 			workorder_da_processare.setEsito(false);
 			workorder_da_processare.setEsito_message( "MOD_SP_KO");
-			if(!workorder_da_processare.getEsito_dettagli().isEmpty())
+			if(!workorder_da_processare.getEsito_dettagli().isEmpty()) {
 				workorder_da_processare.setEsito_dettagli(e.getMessage());
+			}
 			logger.error(workorder_da_processare.getIdentificativo()+": "+e.getMessage());
 			return false;
 		}

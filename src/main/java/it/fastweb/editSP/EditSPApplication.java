@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.bmc.arsys.api.ARException;
 
@@ -17,7 +17,7 @@ import it.fastweb.editSP.service.RemedyService;
 
 public class EditSPApplication {
 
-	static final Logger logger = LogManager.getLogger(EditSPApplication.class.getName());
+	private static  Logger logger = LoggerFactory.getLogger(EditSPApplication.class);
 	private static void close_all_session(SessionRemedyConfiguration remedy_conf, DataConfig db ) {
 		try {
 			remedy_conf.logoutSessionRemedy();
