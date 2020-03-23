@@ -13,7 +13,7 @@ import com.bmc.arsys.api.ARException;
 import it.fastweb.cancellazioniSP.config.DataConfig;
 import it.fastweb.cancellazioniSP.config.SessionRemedyConfiguration;
 import it.fastweb.cancellazioniSP.model.Elemento;
-import it.fastweb.cancellazioniSP.model.WorkOrderSP;
+import it.fastweb.cancellazioniSP.model.WorkOrderSP_cancellare;
 import it.fastweb.cancellazioniSP.service.RemedyService;
 
 public class CancellazioniSPApplication {

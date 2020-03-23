@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import it.fastweb.cancellazioniSP.model.DbRowMapperCancellazioniSP;
 import it.fastweb.cancellazioniSP.model.Elemento;
-import it.fastweb.cancellazioniSP.model.WorkOrderSP;
+import it.fastweb.cancellazioniSP.model.WorkOrderSP_cancellare;
 
 public class DataConfig extends Common_configuration {
 
