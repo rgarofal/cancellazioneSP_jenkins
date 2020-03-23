@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import it.fastweb.cancellazioniSP.config.DataConfig;
 import it.fastweb.cancellazioniSP.config.SessionRemedyConfiguration;
 import it.fastweb.cancellazioniSP.model.Elemento;
-import it.fastweb.cancellazioniSP.model.WorkOrderSP_cancellare;
 
 public class RemedyService {
 	private SessionRemedyConfiguration sessionRemedy;

@@ -34,7 +34,7 @@ import com.bmc.arsys.api.Value;
 
 
 import it.fastweb.cancellazioniSP.model.Elemento;
-import it.fastweb.cancellazioniSP.model.WorkOrderSP_cancellare;
+
 
 public class RemedyDao {
 
