@@ -1,9 +1,9 @@
-package it.fastweb.editSP.model;
+package it.fastweb.cancellazioniSP.model;
 
 import java.time.LocalDate;
 import java.util.Date;
 
-import it.fastweb.editSP.config.Utility;
+import it.fastweb.cancellazioniSP.config.Utility;
 
 public class WorkOrderSP {
 
@@ -511,7 +511,7 @@ public class WorkOrderSP {
 	}
 
 	/*
-	 * Se lo stato atteso è diverso da quello che si trova,
+	 * Se lo stato atteso ï¿½ diverso da quello che si trova,
 	 * o il codice (o dettaglio) di attesa/chiusura sono diversi, si restituisce errore.
 	 * 
 	 */

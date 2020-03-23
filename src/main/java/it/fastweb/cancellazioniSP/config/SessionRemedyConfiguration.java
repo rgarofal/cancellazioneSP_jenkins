@@ -1,9 +1,10 @@
-package it.fastweb.editSP.config;
+package it.fastweb.cancellazioniSP.config;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ import com.bmc.arsys.api.ARServerUser;
 
 //import it.fastweb.apreTT.client.SessionRemedyClient;
 
-public class SessionRemedyConfiguration extends Common_configuration {
+public class SessionRemedyConfiguration  {
 
 	 //private SessionRemedyClient sessionRemedy;
 	 static Logger logger = LoggerFactory.getLogger(SessionRemedyConfiguration.class);
@@ -27,17 +28,12 @@ public class SessionRemedyConfiguration extends Common_configuration {
 
 	   
 	    //public SessionRemedyConfiguration(//SessionRemedyClient sessionRemedyClient) {
-	 public SessionRemedyConfiguration() throws IOException {
-	        //this.sessionRemedy = sessionRemedyClient;
+	 public SessionRemedyConfiguration(DataConfig db) throws IOException, SQLException, ARException {
+	        
 		    logger.info("Inizializzazione Session Remedy ");
-	        Properties prop = new Properties();
-			InputStream input = null;
-
-	        input = new FileInputStream(getConfigurazione_file());
-			// Carica il file di configurazione.
-			prop.load(input);
-
-			
+		    
+		    
+		    Properties prop = db.getConfigurationForRemedy();
 			servername = prop.getProperty("serverName");
 			username = prop.getProperty("userName");
 			password = prop.getProperty("userPassword");
@@ -52,6 +48,7 @@ public class SessionRemedyConfiguration extends Common_configuration {
 			logger.info("ServerName Remedy = " + servername);
 			logger.info("UserName Remedy = " + username);
 			logger.info("Password Remedy = " + password);
+			openSessionRemedy();
 	    	
 	    }
 	    
@@ -61,10 +58,7 @@ public class SessionRemedyConfiguration extends Common_configuration {
 	    
 	    public void  openSessionRemedy() throws ARException {
 	    		    	
-	    	logger.info("ServerName Remedy = " + this.servername);
-	    	logger.info("UserName Remedy = " + this.username);
-	    	logger.info("Password Remedy = " + this.password );
-			ctx.login();
+	    	ctx.login();
 			logger.info("Session Remedy aperta ");
 			return;
 		}

@@ -1,4 +1,4 @@
-package it.fastweb.editSP.config;
+package it.fastweb.cancellazioniSP.config;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,13 +12,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import it.fastweb.editSP.model.DbRowMapperWorkOrderSP;
-import it.fastweb.editSP.model.WorkOrderSP;
+import it.fastweb.cancellazioniSP.model.DbRowMapperCancellazioniSP;
+import it.fastweb.cancellazioniSP.model.Elemento;
+import it.fastweb.cancellazioniSP.model.WorkOrderSP;
 
 public class DataConfig extends Common_configuration {
 
@@ -26,43 +29,50 @@ public class DataConfig extends Common_configuration {
 	private String DB_URL;
 	private String USER;
 	private String PASS;
-//	private String serverName;
-//	private String userName;
-//	private String userPassword;
+	//	private String serverName;
+	//	private String userName;
+	//	private String userPassword;
 	private String table;
 	private Connection conn = null;
 
+	
+	private static final String QUERY_FIND_CONFIG_FOR_REMEDY = "select * from rco_m0.api_configuration WHERE chiave LIKE 'cancellasp_%'";
 
+	private String sql_read_wo_sp = 
+			"SELECT * FROM cmpa.tbl_cancellazioni_basedati WHERE Esito IS NULL"
+					+ " AND processo IN ('CANC_COMM','CANC_TEC','CH_WO_SBLOCCO_FIBRA','CH_WO_SBLOCCO_ADSL',"
+					+ "'CH_WO_SBLOCCO_WS','CH_WO_FTTS_POST','CH_WO_FTTS_PRE','CH_WO_FTTS_PRE_OLO')"
+					+ " AND Data_esecuzione <=  Date(now())";
+			
+			
+	
+	private String updateResponse = "UPDATE cmpa.tbl_cancellazioni_basedati SET Esito= ?, bpa_agent = 'API'"
+			+ " WHERE id = ? " ;  // +singoloElemento.id+ "' Esito='Regolare'  "
+	
+	
+	
+	
+	private static final Logger log = LoggerFactory.getLogger(DataConfig.class);
 
-	private String sql_read_wo_sp = "SELECT * FROM tts_sp_service.master_SP_EDIT  WHERE Esito IS NULL AND Azione_preimpostata = 'VirtualAgent'" + " ORDER BY data_inserimento";
-	private String updateResponseWO = "UPDATE tts_sp_service.master_SP_EDIT SET Esito= ? , Data_Esito = NOW(), Esito_Dettagli = ?  WHERE RCO_ID = ?";
-
-
-	public DataConfig() throws IOException, FileNotFoundException, SQLException {
-
+	public DataConfig(boolean  config_test) throws IOException, FileNotFoundException, SQLException {
+		super(config_test);
 		Properties prop = new Properties();
 		InputStream input = null;
 		Utility ut = new Utility();
 
-		try {
+		log.info("Lettura Configurazione database");
 
-			logger.info("Lettura Configurazione");
-			String path = null;
-			try {
-				path = ut.writeResourceToFile(getConfigurazione_file());
-			} catch (URISyntaxException e) {
-				logger.error("File di configurazione non trovato." + e.getMessage());
-			}
-			input = new FileInputStream(path);
+		try {
 			// Carica il file di configurazione.
 
+			input = ClassLoader.class.getResourceAsStream("/"+ getConfigurazione_file());
+
 			prop.load(input);
+
 
 			DB_URL = prop.getProperty("database");
 			USER = prop.getProperty("username");
 			PASS = prop.getProperty("password");
-
-			table = prop.getProperty("table");
 
 			conn = (DriverManager.getConnection(DB_URL, USER, PASS));
 			logger.info("Connessione al Database configurata");
@@ -87,12 +97,41 @@ public class DataConfig extends Common_configuration {
 		}
 	}
 
-	public ArrayList<WorkOrderSP> read_data_wo_sp() throws SQLException {
+	public Properties getConfigurationForRemedy() throws SQLException {
+
+		Properties properties = new Properties();
+		ResultSet resultSet = null;
+		Statement stmt = null;
+
+
+		stmt = conn.createStatement();
+		resultSet = stmt.executeQuery(QUERY_FIND_CONFIG_FOR_REMEDY);
+		log.debug("Ho eseguito query: " + QUERY_FIND_CONFIG_FOR_REMEDY);
+
+		Map<String, String> values = new HashMap<String, String>();
+
+		while (resultSet.next()) {
+
+			String key = resultSet.getString("chiave");
+			String value = resultSet.getString("valore");
+			values.put(key, value);
+
+		}
+
+		stmt.close();
+		//conn.close();
+		properties.setProperty("userName", values.get("cancellasp_remedy_username"));
+		properties.setProperty("userPassword", values.get("cancellasp_remedy_password"));
+		properties.setProperty("serverName", values.get("cancellasp_server"));
+
+		return properties;
+	}
+	public ArrayList<Elemento> read_data_dacancellare_sp() throws SQLException {
 
 		ResultSet rs = null;
 		Statement stmt = null;
-		DbRowMapperWorkOrderSP row = new DbRowMapperWorkOrderSP();
-		ArrayList<WorkOrderSP> lista_elementi = new ArrayList<WorkOrderSP>();
+		DbRowMapperCancellazioniSP row = new DbRowMapperCancellazioniSP();
+		ArrayList<Elemento> lista_elementi = new ArrayList<Elemento>();
 
 		stmt = conn.createStatement();
 		rs = stmt.executeQuery(sql_read_wo_sp);
@@ -112,37 +151,43 @@ public class DataConfig extends Common_configuration {
 		logger.info("Chiusura connessione Database");
 		conn.close();
 	}
-	
-	public void update_stato_workorder_elaborato(WorkOrderSP workOrdersp_aggiornato) throws Exception {
 
-		logger.info("Work Order aggiornato - aggiornamento dati su db " + workOrdersp_aggiornato.getIdentificativo());
+	public void update_stato_cancellazioneSP(Elemento elemento_cancellato) throws Exception {
 
+		logger.info("Cancellazione SP - aggiornamento dati su db " + elemento_cancellato.getIdentificativo());
+		
 		try {	
-
-			updateEsito(workOrdersp_aggiornato.getEsito_message(),workOrdersp_aggiornato.getEsito_dettagli(),workOrdersp_aggiornato.getRco_id());
+            if(elemento_cancellato.isEseguito()) {
+            	updateEsito(elemento_cancellato.getMessaggio_esito(),elemento_cancellato.getId());
+            }
+            else
+            {
+            	updateEsito(elemento_cancellato.getErrore(),elemento_cancellato.getId());
+            }
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			logger.error("*****Errore nell'inserimento del ticket nr " + workOrdersp_aggiornato.getIdentificativo());
+			logger.error("*****Errore nella cancellazione SP  " + elemento_cancellato.getIdentificativo());
 		}
 
 
 	}
 
-	private void updateEsito(String esito_messaggio, String esito_dettagli, String rco_id) throws SQLException {
+	private void updateEsito(String esito_messaggio, String rco_id) throws SQLException {
 
 		String sql = "";
 
-		logger.info("Update updateResponseCodeOk");
-		sql = updateResponseWO;
+		logger.info("Aggiorno l'esito ");
+		sql = updateResponse;
+		
 
 		PreparedStatement pstmt = conn.prepareStatement(sql);
 
 
 		pstmt.setString(1, esito_messaggio);
-		pstmt.setString(2, esito_dettagli);
-		pstmt.setString(3, rco_id);
-
+		pstmt.setString(2, rco_id);
+        pstmt.toString();
 		pstmt.executeUpdate();
-
+      
 	}
 }

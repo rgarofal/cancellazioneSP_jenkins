@@ -2,13 +2,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>EditSP</groupId>
-	<artifactId>editSP_jenkins</artifactId>
+	<groupId>CancellazioniSP_jenkins</groupId>
+	<artifactId>cancellazioniSP_jenkins</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 
-	<name>editSP_jenkins</name>
+	<name>cancellazioniSP_jenkins</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,7 +26,30 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<!-- Includes the runtime dependencies create a executable jar -->
+			<!-- Includes the runtime dependencies -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>it.fastweb.cancellazioniSP.CancellazioniSPApplication</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Includes the runtime dependencies create a executable jar 
 			<plugin>
 				<groupId>com.jolira</groupId>
 				<artifactId>onejar-maven-plugin</artifactId>
@@ -38,7 +61,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<!-- End Includes the runtime dependencies create a executable jar -->
 			<!-- to create the MANIFEST -->
 			<plugin>
@@ -50,7 +73,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>it.fastweb.editSP.EditSPApplication</mainClass>
+							<mainClass>it.fastweb.cancellazioniSP.CancellazioniSPApplication</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

@@ -1,4 +1,4 @@
-package it.fastweb.editSP.config;
+package it.fastweb.cancellazioniSP.config;
 
 import com.jcraft.jsch.ChannelSftp;
 

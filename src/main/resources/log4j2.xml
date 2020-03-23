@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <properties>
-        <property name="name">editSP-jenkins</property>
+        <property name="name">cancellazioniSP-jenkins</property>
         <property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5.5p | %-10.10t | %-20.20C:%-5.5L | %msg%n</property>
         <!--
         It will look like that:

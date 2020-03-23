@@ -1,0 +1,495 @@
+ private static boolean verificaStatoCancellazione(Elemento elemento) throws ARException
+    {
+    	try {  
+    		int[] intArray = new int[1];
+    		intArray[0] = 800000200;	// Invio Evento Cancellato
+
+    		String schemaName = "OFTS Crea Eventi";  
+    		Entry entry = new Entry(); 
+    		entry = ctx.getEntry(schemaName, elemento.identificativo, intArray); 
+
+    		for (Integer fieldID : entry.keySet()) {  
+    			Value val = entry.get(fieldID);  
+    			Field field = ctx.getField(schemaName, fieldID);  
+
+    			if (field instanceof SelectionField) {  
+    				SelectionFieldLimit sFieldLimit = (SelectionFieldLimit)field.getFieldLimit();  
+    				if (sFieldLimit != null) {  
+    					List<EnumItem> eItemList = sFieldLimit.getValues();  
+    					for (EnumItem eItem : eItemList) {  
+    						if (eItem.getEnumItemNumber() == Integer.parseInt(val.toString()))
+    						{
+    							if(eItem.getEnumItemName().equals("Invia cancellazione"))
+    								return false;
+    							else 
+    								return true;
+    						}  
+    					}  
+    				}  
+    			}
+    		}
+    	} catch (ARException e) {  
+    		logger.error(e.getMessage());
+    		return false;
+    	} 
+    	return false;
+    }
+    
+    
+    private static boolean verificaStatoWO(Elemento elemento) throws ARException
+    {
+    	try {  
+    		int[] intArray = new int[1];
+    		intArray[0] = 7;	// Stato work order
+
+    		String schemaName = "";
+    		
+           	if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_ADSL"))
+        		schemaName = "SP_DSL_WO_ALL";
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_FIBRA"))
+        		schemaName = "OFTS WO";
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_WS"))
+        		schemaName = "SP_HSL_WO_ALL";
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_POST")
+        			|| elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE")
+        			|| elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE_OLO"))
+        		schemaName = "SP_SLU_WO";
+    		
+    		Entry entry = new Entry(); 
+    		entry = ctx.getEntry(schemaName, elemento.identificativo, intArray); 
+
+    		for (Integer fieldID : entry.keySet()) {  
+    			Value val = entry.get(fieldID);  
+    			Field field = ctx.getField(schemaName, fieldID);  
+
+    			if (field instanceof SelectionField) {  
+    				SelectionFieldLimit sFieldLimit = (SelectionFieldLimit)field.getFieldLimit();  
+    				if (sFieldLimit != null) {  
+    					List<EnumItem> eItemList = sFieldLimit.getValues();  
+    					for (EnumItem eItem : eItemList) {  
+    						if (eItem.getEnumItemNumber() == Integer.parseInt(val.toString()))
+    						{
+    							if(elemento.processo.equals("CH_WO_FTTS_POST")
+    									|| elemento.processo.equals("CH_WO_FTTS_PRE")
+    									|| elemento.processo.equals("CH_WO_FTTS_PRE_OLO"))
+    							{
+    								if(eItem.getEnumItemName().equals("Chiuso"))
+    									return false;
+    								else
+    										return true;
+    							}
+    							else
+    							{  
+    								if(eItem.getEnumItemName().equals("Chiusa"))
+    									return false;
+    								else 
+    									return true;
+    							}
+    						}  
+    					}  
+    				}  
+    			}
+    		}
+    	} catch (ARException e) {  
+    		logger.error(e.getMessage() +" INFO: id: " +elemento.identificativo);
+    		return false;
+    	} 
+    	return false;
+    }
+    
+
+    /*
+     * Serve solo per tirare fuori informazioni del form e dell'entry richiesto.
+     * Se si vuole vedere TUTTI i campi dell'entry, con la relativa descrizione,
+     * basta mettere null come terzo parametro del metodo getEntry, al posto di intArray.
+     * 
+     */
+	private static void getTicketConCampi(Elemento elemento, boolean tuttiCampi) {  
+        try {  
+        	
+        	int[] intArray = new int[5];
+
+        	intArray[0] = 1;			// Stato
+        	intArray[1] = 800000200;	// Invio Evento Cancellato
+        	intArray[2] = 7;	// Stato work order
+        	intArray[3] = 800000223;	// Dettaglio codice attesa
+        	intArray[4] = 800000205;	// Dettaglio codice chiusura
+        	
+        	String schemaName = "";
+        	
+        	if(elemento.processo.equalsIgnoreCase("CANC_COMM") || elemento.processo.equalsIgnoreCase("CANC_TEC"))
+        		schemaName = "OFTS Crea Eventi";
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_ADSL"))
+        		schemaName = "SP_DSL_WO_ALL";
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_FIBRA"))
+        		schemaName = "OFTS WO";
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_WS"))
+        		schemaName = "SP_HSL_WO_ALL";
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_POST")
+        			|| elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE")
+        			|| elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE_OLO"))
+        		schemaName = "SP_SLU_WO";
+        	else if(elemento.processo.equalsIgnoreCase("TESTWO"))
+        		schemaName = "SP_SLU_WO";
+        	else if(elemento.processo.equalsIgnoreCase("TESTTR"))
+        		schemaName = "SP_SLU_WO_TRANSIZIONI";
+            
+            
+            Entry entry = new Entry(); 
+            if(tuttiCampi)
+            	entry = ctx.getEntry(schemaName, elemento.identificativo, null);
+            else
+            	entry = ctx.getEntry(schemaName, elemento.identificativo, intArray);  
+            
+            for (Integer fieldID : entry.keySet()) {  
+                Value val = entry.get(fieldID);  
+                Field field = ctx.getField(schemaName, fieldID);  
+                if (val.toString() != null) { 
+                	System.out.println("Campo numero: " +fieldID + " : ");
+                    if (field instanceof CharacterField) {  
+                        if (fieldID != 99) {  
+                            System.out.println(field.getName() + ": " + val.toString() + "\n");  
+                        } else {  
+                            StatusHistoryValue shVal = StatusHistoryValue.decode(val.getValue().toString());  
+                            StringBuilder shBuilder = new StringBuilder();  
+                            if (shVal != null) {  
+                                for (StatusHistoryItem shItem : shVal) {  
+                                    if (shItem != null) {  
+                                        shBuilder.append(shItem.getTimestamp().toDate().toString());  
+                                        shBuilder.append("\u0004").append(shItem.getUser()).append("\u0003");  
+                                    } else {  
+                                        shBuilder.append("\u0003");  
+                                    }  
+                                }  
+                                System.out.println(field.getName() + ": " + shBuilder.toString());  
+                            }  
+                        }  
+                    } else if (field instanceof SelectionField) {  
+                        SelectionFieldLimit sFieldLimit = (SelectionFieldLimit)field.getFieldLimit();  
+                        if (sFieldLimit != null) {  
+                            List<EnumItem> eItemList = sFieldLimit.getValues();  
+                            for (EnumItem eItem : eItemList) {  
+                                if (eItem.getEnumItemNumber() == Integer.parseInt(val.toString())) {  
+                                    System.out.println(field.getName() + ": " + eItem.getEnumItemName());  
+                                }  
+                            }  
+                        }  
+                    } else if (field instanceof CurrencyField) {  
+                        CurrencyValue cCurValue = (CurrencyValue) val.getValue();  
+                        if (cCurValue != null) {  
+                            for (FuncCurrencyInfo curInfo : cCurValue.getFuncCurrencyList()) {  
+                                System.out.println(field.getName() + ": " + curInfo.getValue() + " " + curInfo.getCurrencyCode());  
+                            }  
+                        }  
+                    } else if (field instanceof DateTimeField) {  
+                        Timestamp callDateTimeTS = (Timestamp) val.getValue();  
+                        if (callDateTimeTS != null) {  
+                            System.out.println(field.getName() + ": " + callDateTimeTS.toDate().toString());  
+                        }  
+                    } else if (field instanceof DiaryField) {  
+                        for (DiaryItem dlv : (DiaryListValue)val.getValue()) {  
+                            System.out.println(field.getName() + ": " + "Created by " + dlv.getUser() + " @ " + dlv.getTimestamp().toDate().toString() + " " + dlv.getText());  
+                        }  
+                    } else if (field instanceof AttachmentField) {  
+                        AttachmentValue aVal = (AttachmentValue) val.getValue();  
+                        if (aVal != null) {  
+                            String aName;  
+                            String[] aDetails = aVal.getValueFileName().split("\\.(?=[^\\.]+$)");  
+                            if (aDetails.length == 2) {  
+                                aName = aDetails[0] + "." + aDetails[1];  
+                            } else {  
+                                aName = aDetails[0];  
+                            }  
+                            int lastPos = aName.lastIndexOf('\\');  
+                            String aNameShort = (lastPos < 0) ? aName : aName.substring(lastPos + 1);  
+                            FileOutputStream fos = new FileOutputStream(aNameShort);  
+                            byte[] attach = ctx.getEntryBlob(schemaName, elemento.identificativo, fieldID);  
+                            fos.write(attach);  
+                            fos.close();  
+                        }  
+                    } else {  
+                        System.out.println(field.getName() + ": " + val.toString());  
+                    }  
+                }  
+            }  
+        } catch (ARException e) {  
+            logger.error(e.getMessage() +" INFO: identificativo: " +elemento.identificativo);
+        } catch (FileNotFoundException e) {   
+            logger.error(e.getMessage());
+        } catch (IOException e) {   
+            logger.error(e.getMessage());
+        }  
+    }  
+	
+	
+	
+	private static void getDettagliWO(Elemento elemento)
+	{
+		try {  
+			// Per le categorie FTTS
+			int[] intArray = new int[10];
+			intArray[0] = 800000542;	// GUID
+			intArray[1] = 802000001;	// Order ID
+			intArray[2] = 536870922;	// Account no
+			intArray[3] = 700000013;	// Process CFG ID
+			intArray[4] = 700000082;	// FO ID
+			intArray[5] = 800000029;	// Process ID
+			intArray[6] = 800000007;	// Nome FO
+			intArray[7] = 800000041;	// Processo
+			intArray[8] = 800000223;	// Dettaglio Codice Attesa
+			intArray[9] = 802000002;	// Site ID
+			
+			// Per le categorie SBLOCCO_ADSL/FIBRA/WS
+			int[] intArray_SBLOCCO = new int[1];
+			intArray_SBLOCCO[0] = 800000223;	// Dettaglio Codice Attesa
+
+        	String schemaName = "";
+        	Entry entry = new Entry();
+        	
+        	if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_ADSL"))
+        	{
+           		schemaName = "SP_DSL_WO_ALL";
+           		entry = ctx.getEntry(schemaName, elemento.identificativo, intArray_SBLOCCO);
+        	}
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_FIBRA"))
+        	{
+        		schemaName = "OFTS WO";
+        		entry = ctx.getEntry(schemaName, elemento.identificativo, intArray_SBLOCCO);
+        	}
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_SBLOCCO_WS"))
+        	{
+        		schemaName = "SP_HSL_WO_ALL";
+        		entry = ctx.getEntry(schemaName, elemento.identificativo, intArray_SBLOCCO);
+        	}
+        	else if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_POST")
+        			|| elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE")
+        			|| elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE_OLO"))
+        	{
+        		schemaName = "SP_SLU_WO";
+        		entry = ctx.getEntry(schemaName, elemento.identificativo, intArray);
+        	}
+        		
+
+			for (Integer fieldID : entry.keySet())
+			{  
+				Value val = entry.get(fieldID);  
+				Field field = ctx.getField(schemaName, fieldID); 
+				if (val.toString() != null)
+				{
+					if (field instanceof CharacterField)
+					{    
+						if(field.getName().equals("GUID"))
+							elemento.guid = val.toString();
+						else if(field.getName().equals("Account no"))
+							elemento.account_no = val.toString();
+						else if(field.getName().equals("Process CFG ID"))
+							elemento.process_CFG_ID = val.toString();
+						else if(field.getName().equals("FO ID"))
+							elemento.fo_ID = val.toString();
+						else if(field.getName().equals("Process ID"))
+							elemento.process_ID = val.toString();
+						else if(field.getName().equals("Nome FO"))
+							elemento.nome_FO = val.toString();
+						else if(field.getName().equals("Processo"))
+							elemento.processo_wo = val.toString();
+						else if(field.getName().equals("Dettaglio Codice Attesa"))
+						{
+							elemento.dettaglio_codice_attesa = val.toString();
+							elemento.dettaglio_codice_chiusura = elemento.dettaglio_codice_attesa;
+						}				
+					}
+					else 
+					{  
+						if(field.getName().equals("Order ID"))
+							elemento.order_ID = val.toString();
+						else if(field.getName().equals("Site ID"))
+							elemento.site_ID = val.toString();
+                    }  
+				}
+			}
+		} catch (ARException e) {   
+			logger.error(e.getMessage() +" INFO: identificativo: " +elemento.identificativo);
+		} 
+	}
+	
+	
+	
+	
+	
+	private static String creaTransizione(Elemento elemento, String tipologia)
+	{
+		try
+		{
+			String schemaName = "SP_SLU_WO_TRANSIZIONI";
+			Entry entry = new Entry();
+			
+			if(tipologia.equals("Chiusura"))
+			{
+				int[] intArray = new int[8];
+				intArray[0] = 7;	// Stato -> Chiuso
+				intArray[1] = 2;	// Utente
+				intArray[2] = 8;	// Nota -> .
+				intArray[3] = 700000086;	// WO ID -> identificativo
+				intArray[4]	= 800000005;	// Codice di Chiusura -> Ordine Cancellato
+				intArray[5]	= 800000205;	// Dettaglio Codice Chiusura
+				intArray[6]	= 802000001;	// Order ID
+				intArray[7]	= 800000542;	// GUID
+
+
+				entry.put(intArray[0],new Value("Chiuso"));
+				entry.put(intArray[1],new Value(elemento.automa));
+				entry.put(intArray[2],new Value("."));
+				entry.put(intArray[3],new Value(elemento.identificativo));
+				entry.put(intArray[4],new Value("Ordine Cancellato"));
+				entry.put(intArray[5],new Value(elemento.dettaglio_codice_chiusura));
+				entry.put(intArray[6],new Value(elemento.order_ID));
+				entry.put(intArray[7],new Value(elemento.guid));	
+			}
+			
+			elemento.codice_transizione = ctx.createEntry(schemaName, entry);
+			logger.info("Transizione creata: " +elemento.codice_transizione+ ". Identificativo WO: " +elemento.identificativo); 
+			
+		}
+			catch (ARException e) {   
+			logger.error(e.getMessage() +" INFO: identificativo: " +elemento.identificativo);
+		} 
+    		
+		return elemento.codice_transizione;	
+	}
+	
+	
+	
+	private static Elemento creaWoOrdineCancellazione(Elemento elemento_generatore)
+	{
+		Elemento elemento = new Elemento("",elemento_generatore.processo, elemento_generatore.id, elemento_generatore.automa);
+
+		try
+		{
+			int[] intArray = new int[16];
+			intArray[0] = 536870922;	// Account no
+			intArray[1] = 700000013;	// Process CFG ID
+			intArray[2] = 7;			// Stato -> In attesa
+			intArray[3] = 700000082;	// FO ID
+			intArray[4] = 700000087;	// Creato Da WO
+			intArray[5] = 700000221;	// Codice di attesa precedente -> Approvazione Cancellazione
+			intArray[6] = 700000222;	// Shadow.Codice di attesa -> Approvazione Cancellazione
+			intArray[7] = 800000001;	// Nome_WO -> ORDINE CANCELLATO
+			intArray[8] = 800000007;	// Nome FO
+			intArray[9] = 800000023;	// Codice di attesa -> Approvazione Cancellazione
+			intArray[10] = 800000029;	// Process ID
+			intArray[11] = 800000041;	// Processo
+			intArray[12] = 800000223;	// Dettaglio Codice Attesa
+			intArray[13] = 800000778;	// Operatore Ultima Modifica
+			intArray[14] = 802000001;	// Order ID			
+			intArray[15] = 802000002;	// Site ID
+			
+			// Passaggio di tutti i parametri (anche se pu� essere superfluo)
+			elemento.account_no = elemento_generatore.account_no;
+			elemento.process_CFG_ID = elemento_generatore.process_CFG_ID;
+			elemento.fo_ID = elemento_generatore.fo_ID;
+			elemento.nome_FO = elemento_generatore.nome_FO;
+			elemento.process_ID = elemento_generatore.process_ID;
+			elemento.processo_wo = elemento_generatore.processo_wo;
+			elemento.dettaglio_codice_attesa = elemento_generatore.dettaglio_codice_chiusura;
+			elemento.automa = elemento_generatore.automa;
+			elemento.order_ID = elemento_generatore.order_ID;
+			elemento.site_ID = elemento_generatore.site_ID;
+			
+			String schemaName = "";
+			
+        	if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_POST")
+        			|| elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE")
+        			|| elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE_OLO"))
+        		schemaName = "SP_SLU_WO";
+        	
+        	Entry entry = new Entry();
+			entry.put(intArray[0],new Value(elemento.account_no));
+			entry.put(intArray[1],new Value(elemento.process_CFG_ID));
+			entry.put(intArray[2],new Value("In attesa"));
+			entry.put(intArray[3],new Value(elemento.fo_ID));
+			
+			if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_POST"))
+				entry.put(intArray[4],new Value("SBLOCCO CLT POST INVIO"));
+			else if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE"))
+				entry.put(intArray[4],new Value("SBLOCCO CLT PRE INVIO"));
+			else if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE_OLO"))
+				entry.put(intArray[4],new Value("SBLOCCO CLT PRE INVIO OLO"));
+			
+			entry.put(intArray[5],new Value("Approvazione Cancellazione"));
+			entry.put(intArray[6],new Value("Approvazione Cancellazione"));
+			entry.put(intArray[7],new Value("ORDINE CANCELLATO"));
+			entry.put(intArray[8],new Value(elemento.nome_FO));
+			entry.put(intArray[9],new Value("Approvazione Cancellazione"));
+			entry.put(intArray[10],new Value(elemento.process_ID));
+			entry.put(intArray[11],new Value(elemento.processo_wo));
+			entry.put(intArray[12],new Value(elemento.dettaglio_codice_attesa));
+			entry.put(intArray[13],new Value(elemento.automa));
+			entry.put(intArray[14],new Value(elemento.order_ID));
+			entry.put(intArray[15],new Value(elemento.site_ID));
+			
+			elemento.identificativo = ctx.createEntry(schemaName, entry);  
+			
+			logger.info("WO Ordine di cancellazione creato: " +elemento.identificativo);
+			
+			// Una volta creato l'elemento, � necessario reperire i campi impostati, come il GUID
+			getDettagliWO(elemento);
+			
+			int[] intArrayTransizione = new int[17];
+			intArrayTransizione[0] = 2;	// Utente
+			intArrayTransizione[1] = 7;	// Stato -> In attesa
+			intArrayTransizione[2] = 8;	// Nota -> .
+			intArrayTransizione[3] = 700000086;	// WO ID -> identificativo
+			intArrayTransizione[4] = 700000090;	// From Codice di Chiusura -> Ordine Cancellato   (scritto con solo le iniziali maiuscole)
+			intArrayTransizione[5] = 700000092;	// From Dettaglio Codice Chiusura -> dettaglio_codice_attesa
+			intArrayTransizione[6] = 700000094;	// From FO ID
+			intArrayTransizione[7] = 700000095;	// From Process ID
+			intArrayTransizione[8] = 700000096;	// From Nome FO
+			intArrayTransizione[9] = 700000097;	// From Processo
+			intArrayTransizione[10] = 700000100;	// From Nome WO -> SBLOCCO CLT POST/PRE/PRE OLO INVIO
+			intArrayTransizione[11] = 707000507;	// From Stato -> Chiuso
+			intArrayTransizione[12] = 800000023;	// Codice di attesa -> Approvazione Cancellazione
+			intArrayTransizione[13] = 800000223;	// Dettaglio Codice Attesa -> dettaglio_codice_attesa
+			intArrayTransizione[14] = 800000542;	// GUID
+			intArrayTransizione[15] = 802000001;	// Order ID
+			
+					
+			String form = "SP_SLU_WO_TRANSIZIONI";
+			
+			String queryString = "'WO ID' = \"" +elemento.identificativo+"\"";  
+			QualifierInfo qual = ctx.parseQualification(form, queryString);   
+	        List<Entry> entries = ctx.getListEntryObjects(form, qual, 0, 0, null, null, false, null); 	
+	        Entry transizione = ctx.getEntry(form, entries.get(0).getEntryId(), intArray);
+			
+	        
+	        transizione.put(intArrayTransizione[0],new Value(elemento.automa));
+	        transizione.put(intArrayTransizione[1],new Value("In attesa"));
+	        transizione.put(intArrayTransizione[2],new Value("."));
+	        transizione.put(intArrayTransizione[3],new Value(elemento.identificativo));
+	        transizione.put(intArrayTransizione[4],new Value("Ordine Cancellato"));
+	        transizione.put(intArrayTransizione[5],new Value(elemento.dettaglio_codice_attesa));
+	        transizione.put(intArrayTransizione[6],new Value(elemento.fo_ID));
+	        transizione.put(intArrayTransizione[7],new Value(elemento.process_ID));
+	        transizione.put(intArrayTransizione[8],new Value(elemento.nome_FO));
+	        transizione.put(intArrayTransizione[9],new Value(elemento.processo_wo));
+	        
+	        if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_POST"))
+	        	transizione.put(intArrayTransizione[10],new Value("SBLOCCO CLT POST INVIO"));
+	        else if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE"))
+	        	transizione.put(intArrayTransizione[10],new Value("SBLOCCO CLT PRE INVIO"));
+	        else if(elemento.processo.equalsIgnoreCase("CH_WO_FTTS_PRE_OLO"))
+	        	transizione.put(intArrayTransizione[10],new Value("SBLOCCO CLT PRE INVIO OLO"));
+	                
+	        transizione.put(intArrayTransizione[11],new Value("Chiuso"));
+	        transizione.put(intArrayTransizione[12],new Value("Approvazione Cancellazione"));
+			transizione.put(intArrayTransizione[13],new Value(elemento.dettaglio_codice_attesa));
+			transizione.put(intArrayTransizione[14],new Value(elemento.guid));
+			transizione.put(intArrayTransizione[15],new Value(elemento.order_ID));		
+			
+			ctx.setEntry(form, entries.get(0).getEntryId(), transizione, null, 0);
+		}
+		catch (ARException e) {   
+		logger.error(e.getMessage() +" INFO: identificativo generatore: " +elemento_generatore.identificativo);
+	} 
+		
+		return elemento;
+	}
