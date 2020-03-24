@@ -68,13 +68,24 @@ public class Elemento {
 		return dettaglio_codice_chiusura;
 	}
 	
+	public boolean is_not_set_Dettaglio_codice_chiusura() {
+		boolean esito = false;
+		if (this.dettaglio_codice_chiusura == null ||
+	        this.dettaglio_codice_chiusura.isEmpty()){
+	        	esito = true;
+	        } else {
+	        	esito = false;
+	        }
+	   return esito;
+	}
+	
 	public boolean is_set_Dettaglio_codice_chiusura() {
 		boolean esito = false;
 		if (this.dettaglio_codice_chiusura != null ||
 	        !this.dettaglio_codice_chiusura.equals("")){
 	        	esito = true;
 	        } else {
-	        	
+	        	esito = false;
 	        }
 	   return esito;
 	}

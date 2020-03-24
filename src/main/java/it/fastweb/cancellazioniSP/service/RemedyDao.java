@@ -115,8 +115,8 @@ public class RemedyDao {
         		entry.put(intArray[0],new Value("Chiusa"));
     			entry.put(intArray[1],new Value("Ordine Cancellato"));
     			entry.put(intArray[2],new Value(elemento.getDettaglio_codice_chiusura()));
-    			
-    			if(!elemento.is_set_Dettaglio_codice_chiusura())
+    		
+    			if(elemento.is_not_set_Dettaglio_codice_chiusura())
     			{
     				logger.error("Dettaglio codice chiusura non presente. INFO: id: " +elemento.getIdentificativo());
     				return false;
@@ -166,7 +166,7 @@ public class RemedyDao {
         		entry.put(intArray[6],new Value(elemento.getAutoma()));  			
     			entry.put(intArray[7],new Value("Cancellazione Tecnica"));
     			
-    			if(!elemento.is_set_Dettaglio_codice_chiusura())
+    			if(elemento.is_not_set_Dettaglio_codice_chiusura())
     			{
     				logger.error("Dettaglio codice chiusura non presente. INFO: id: " +elemento.getIdentificativo());
     				return false;
@@ -386,7 +386,7 @@ public class RemedyDao {
 
 			for (Integer fieldID : entry.keySet()) {  
 				Value val = entry.get(fieldID);  
-				Field field = ctx.getField(schemaName, fieldID);  
+				Field field = ctx.getField(schemaName, fieldID.intValue());  
 
 				if (field instanceof SelectionField) {  
 					SelectionFieldLimit sFieldLimit = (SelectionFieldLimit)field.getFieldLimit();  
@@ -524,7 +524,7 @@ public class RemedyDao {
 
     		for (Integer fieldID : entry.keySet()) {  
     			Value val = entry.get(fieldID);  
-    			Field field = ctx.getField(schemaName, fieldID);  
+    			Field field = ctx.getField(schemaName, fieldID.intValue());  
 
     			if (field instanceof SelectionField) {  
     				SelectionFieldLimit sFieldLimit = (SelectionFieldLimit)field.getFieldLimit();  
@@ -540,7 +540,7 @@ public class RemedyDao {
     								if(eItem.getEnumItemName().equals("Chiuso"))
     									return false;
     								else
-    										return true;
+    									return true;
     							}
     							else
     							{  
@@ -606,11 +606,11 @@ public class RemedyDao {
             
             for (Integer fieldID : entry.keySet()) {  
                 Value val = entry.get(fieldID);  
-                Field field = ctx.getField(schemaName, fieldID);  
+                Field field = ctx.getField(schemaName, fieldID.intValue());  
                 if (val.toString() != null) { 
                 	logger.info("Campo numero: " +fieldID + " : ");
                     if (field instanceof CharacterField) {  
-                        if (fieldID != 99) {  
+                        if (fieldID.intValue() != 99) {  
                         	logger.info("Field ID diverso da 99 : " +field.getName() + ": " + val.toString() + "\n"); 
                         } else {  
                             StatusHistoryValue shVal = StatusHistoryValue.decode(val.getValue().toString());  
@@ -666,7 +666,7 @@ public class RemedyDao {
                             int lastPos = aName.lastIndexOf('\\');  
                             String aNameShort = (lastPos < 0) ? aName : aName.substring(lastPos + 1);  
                             FileOutputStream fos = new FileOutputStream(aNameShort);  
-                            byte[] attach = ctx.getEntryBlob(schemaName, elemento.getIdentificativo(), fieldID);  
+                            byte[] attach = ctx.getEntryBlob(schemaName, elemento.getIdentificativo(), fieldID.intValue());  
                             fos.write(attach);  
                             fos.close();  
                         }  
